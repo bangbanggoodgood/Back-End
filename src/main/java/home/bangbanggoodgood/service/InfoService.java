@@ -8,7 +8,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class InfoService {
 
     private final InfoRepository repo;
@@ -28,5 +27,10 @@ public class InfoService {
         List<String> dongList = repo.findDongNameBySidoNameAndGugunName(sido, gugun);
         return dongList;
 
+    }
+
+    public String findDongCode(String sido, String gugun, String dong) {
+        String dongCode = repo.findIdBySidoNameAndGugunName(sido, gugun, dong);
+        return dongCode;
     }
 }
