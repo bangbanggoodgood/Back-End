@@ -1,5 +1,6 @@
 package home.bangbanggoodgood.controller;
 
+import home.bangbanggoodgood.dto.DetailFinalResponseDto;
 import home.bangbanggoodgood.service.DealService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,14 @@ public class DetailController {
     public ResponseEntity<Map<String, Double>> getDealGraphAmount(@RequestParam String period,
                                                                    @RequestParam String aptSeq) {
         Map<String, Double> result = dealService.getGraphDetail(aptSeq);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @GetMapping("/detailChart")
+    public ResponseEntity<DetailFinalResponseDto> getDealChartAmount(@RequestParam String presentPage,
+                                                                     @RequestParam String aptSeq,
+                                                                     @RequestParam int limit) {
+        DetailFinalResponseDto result = dealService.getDetailChart(aptSeq);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }
