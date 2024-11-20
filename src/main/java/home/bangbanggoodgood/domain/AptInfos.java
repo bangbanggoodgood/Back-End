@@ -1,11 +1,13 @@
 package home.bangbanggoodgood.domain;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
 @Table(name="houseinfos")
 public class AptInfos {
 
@@ -52,9 +54,13 @@ public class AptInfos {
     @Column(name="comment")
     private String comment;
 
-    @Column(name="like_count")
-    private int likeCount;
+    @Column(name = "like_count")
+    private Long count = 0L;
 
-//    @OneToMany(mappedBy = "aptInfos")
-//    private List<AptDeals> aptDeals = new ArrayList<>();
+//    @OneToMany(mappedBy = "aptInfo")
+//    private List<Likes> likes;
+
+    public void updateCount(Long newCount) {
+        this.count += newCount;
+    }
 }

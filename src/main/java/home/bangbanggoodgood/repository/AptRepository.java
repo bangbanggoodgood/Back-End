@@ -96,4 +96,5 @@ public interface AptRepository extends JpaRepository<AptInfos, String> {
                                              @Param("minPrice") int minPrice,
                                              @Param("maxPrice") int maxPrice);
 
+    AptInfos findByAptSeq(String aptSeq);
 }
