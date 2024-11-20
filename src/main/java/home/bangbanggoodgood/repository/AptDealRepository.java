@@ -25,4 +25,15 @@ public interface AptDealRepository extends JpaRepository<AptDeals, Long> {
             @Param("currentMonth") int currentMonth,
             @Param("aptSeq") String aptSeq);
 
+
+    @Query("SELECT CONCAT(CAST(ad.dealYear AS string), LPAD(CAST(ad.dealMonth AS string), 2, '0')), "
+            + "CAST(REPLACE(ad.dealAmount, ',', '') AS integer), "
+            + "ad.excluUseAr, "
+            + "ad.floor "
+            + "FROM AptDeals ad "
+            + "WHERE ad.aptSeq = :aptSeq "
+            + "ORDER BY ad.dealYear DESC, ad.dealMonth DESC")
+    List<Tuple> findDealsTable(@Param("aptSeq") String aptSeq);
+
+
 }
