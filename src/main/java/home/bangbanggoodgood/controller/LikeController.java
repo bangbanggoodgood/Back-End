@@ -1,5 +1,7 @@
 package home.bangbanggoodgood.controller;
 
+import home.bangbanggoodgood.dto.AptFinalResponseDto;
+import home.bangbanggoodgood.dto.AptResponseDto;
 import home.bangbanggoodgood.dto.LikeRequestDto;
 import home.bangbanggoodgood.dto.LikeResponseDto;
 import home.bangbanggoodgood.service.LikeService;
@@ -7,9 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -23,4 +25,13 @@ public class LikeController {
         LikeResponseDto count = likeService.postLike(requestDto.getMemberId(), requestDto);
         return new ResponseEntity<>(count, HttpStatus.OK);
     }
+
+    @GetMapping("/{memberId}")
+    public ResponseEntity<AptFinalResponseDto> getLikes(@RequestParam int presentPage,
+                                                        @RequestParam int limit,
+                                                        @PathVariable Long memberId) {
+        AptFinalResponseDto result = likeService.getLikes(memberId);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
 }
