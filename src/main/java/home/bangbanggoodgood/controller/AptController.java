@@ -1,5 +1,6 @@
 package home.bangbanggoodgood.controller;
 
+import home.bangbanggoodgood.dto.AptFinalResponseDto;
 import home.bangbanggoodgood.dto.AptRequestDto;
 import home.bangbanggoodgood.dto.AptResponseDto;
 import home.bangbanggoodgood.service.AptService;
@@ -22,10 +23,10 @@ public class AptController {
     private final AptService aptService;
 
     @PostMapping
-    public ResponseEntity<List<AptResponseDto>> getDealList(@RequestParam String presentPage,
+    public ResponseEntity<AptFinalResponseDto> getDealList(@RequestParam String presentPage,
                                                             @RequestParam String limit,
                                                             @RequestBody AptRequestDto requestDto) {
-        List<AptResponseDto> result = aptService.findDealList(requestDto);
+        AptFinalResponseDto result = aptService.show(requestDto);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

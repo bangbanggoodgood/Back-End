@@ -8,4 +8,6 @@ public class AptRequestDto {
     String sidoName;
     String gugunName;
     String dongName;
+    int targetMinPrice;
+    int targetMaxPrice;
 }

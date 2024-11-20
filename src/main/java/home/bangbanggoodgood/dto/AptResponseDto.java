@@ -18,10 +18,9 @@ public class AptResponseDto {
     BigDecimal minArea;
     String address;
    // Map<String, Integer> infra;
-    int minDealAmount;
     int maxDealAmount;
+    int minDealAmount;
    // String comment;
    // int likeCount;
 
-    // (java.lang.String, java.lang.String, java.lang.Integer, java.lang.Double, java.lang.Double, java.lang.String, int, int)'
 }

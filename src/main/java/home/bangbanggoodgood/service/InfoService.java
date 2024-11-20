@@ -33,4 +33,9 @@ public class InfoService {
         String dongCode = repo.findIdBySidoNameAndGugunName(sido, gugun, dong);
         return dongCode;
     }
+
+    public List<String> findDongCodes(String sido, String gugun) {
+        List<String> dongCodes = repo.findDongCodesBySidoNameAndGugunName(sido, gugun);
+        return dongCodes;
+    }
 }
