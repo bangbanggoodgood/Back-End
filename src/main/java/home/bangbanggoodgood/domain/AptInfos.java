@@ -57,8 +57,8 @@ public class AptInfos {
     @Column(name = "like_count")
     private Long count = 0L;
 
-//    @OneToMany(mappedBy = "aptInfo")
-//    private List<Likes> likes;
+    @OneToMany(mappedBy = "aptInfo")
+    private List<Likes> likes;
 
     public void updateCount(Long newCount) {
         this.count += newCount;
