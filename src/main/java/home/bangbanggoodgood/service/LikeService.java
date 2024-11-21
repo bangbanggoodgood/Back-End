@@ -25,6 +25,7 @@ public class LikeService {
     private final MemberRepository memberRepository;
     private final AptRepository aptRepository;
     private final InfoRepository infoRepository;
+    private final LikeRepository likeRepository;
 
     public LikeResponseDto postLike(Long memberId, LikeRequestDto requestDto) {
         Members members = memberRepository.findMemberById(memberId);
@@ -43,14 +44,15 @@ public class LikeService {
 
     public AptFinalResponseDto getLikes(Long memberId) {
         List<Tuple> tuples = findSidoAndGugun(memberId);
-        List<AptResponseDto> result = getResult(tuples);
+        List<AptResponseDto> result = getResult(tuples, memberId);
         int total = result.size();
         return new AptFinalResponseDto(total, result);
     }
 
-    private List<AptResponseDto> getResult(List<Tuple> tuples) {
+    private List<AptResponseDto> getResult(List<Tuple> tuples, Long memberId) {
         List<AptResponseDto> result = new ArrayList<>();
         for(Tuple tuple : tuples) {
+            Long like = isLikeNow(tuple.get(0, String.class), memberId);
             result.add(new AptResponseDto(
                     tuple.get(0, String.class),
                     tuple.get(1, String.class),
@@ -59,7 +61,8 @@ public class LikeService {
                     tuple.get(4, BigDecimal.class),
                     tuple.get(5, String.class),
                     tuple.get(6, Integer.class),
-                    tuple.get(7, Integer.class)
+                    tuple.get(7, Integer.class),
+                    like
             ));
         }
         return result;
@@ -78,6 +81,16 @@ public class LikeService {
         }
 
         return tuples;
+    }
+
+
+    private Long isLikeNow(String aptSeq, Long memberId) {
+        Members members = memberRepository.findMemberById(memberId);
+        Optional<Likes> likes = likeRepository.findByMemberAndAptInfo_AptSeq(members, aptSeq);
+        if(likes.isEmpty()) {
+            return 0L;
+        }
+        return 1L;
     }
 
 }
