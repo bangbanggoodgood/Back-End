@@ -5,6 +5,7 @@ import home.bangbanggoodgood.domain.Likes;
 import home.bangbanggoodgood.domain.Members;
 import home.bangbanggoodgood.dto.*;
 import home.bangbanggoodgood.repository.AptRepository;
+import home.bangbanggoodgood.repository.InfoRepository;
 import home.bangbanggoodgood.repository.LikeRepository;
 import home.bangbanggoodgood.repository.MemberRepository;
 import jakarta.persistence.Tuple;
@@ -23,6 +24,7 @@ public class LikeService {
     private final LikeRepository repository;
     private final MemberRepository memberRepository;
     private final AptRepository aptRepository;
+    private final InfoRepository infoRepository;
 
     public LikeResponseDto postLike(Long memberId, LikeRequestDto requestDto) {
         Members members = memberRepository.findMemberById(memberId);
@@ -40,8 +42,7 @@ public class LikeService {
     }
 
     public AptFinalResponseDto getLikes(Long memberId) {
-        List<Tuple> tuples = null;
-        tuples = repository.findAptInfosByMemberId(memberId);
+        List<Tuple> tuples = findSidoAndGugun(memberId);
         List<AptResponseDto> result = getResult(tuples);
         int total = result.size();
         return new AptFinalResponseDto(total, result);
@@ -62,6 +63,21 @@ public class LikeService {
             ));
         }
         return result;
+    }
+
+    private List<Tuple> findSidoAndGugun(Long memberId) {
+        List<String> dongCode = repository.findDongCodeByAptInfos(memberId);
+        List<Tuple> tuples = new ArrayList<>();
+        for(String dong : dongCode) {
+            String sidoName = infoRepository.findSidoNameByDongCode(dong);
+            String gugunName = infoRepository.findGugunNameByDongCodeAndSidoName(sidoName, dong);
+            String sidoGugun = sidoName +" "+ gugunName;
+
+            System.out.println("dong : " + dong + " " + "sidoName : " + sidoName + "gugunName : " + gugunName);
+            tuples = repository.findAptInfosByMemberId(memberId, sidoGugun);
+        }
+
+        return tuples;
     }
 
 }

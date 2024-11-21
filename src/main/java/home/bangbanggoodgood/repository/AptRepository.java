@@ -19,7 +19,7 @@ public interface AptRepository extends JpaRepository<AptInfos, String> {
             + "hi.buildYear, "
             + "MAX(hd.excluUseAr), "
             + "MIN(hd.excluUseAr), "
-            + "CONCAT(hi.roadNm,' ', hi.roadNmBonbun), "
+            + "CONCAT(:sido,' ',:gugun,' ',hi.roadNm,' ', hi.roadNmBonbun), "
             + "MAX(CAST(REPLACE(hd.dealAmount, ',', '') AS integer)), "
             + "MIN(CAST(REPLACE(hd.dealAmount, ',', '') AS integer)) "
             + "FROM AptDeals hd "
@@ -29,7 +29,9 @@ public interface AptRepository extends JpaRepository<AptInfos, String> {
             + "GROUP BY hi.aptSeq, hi.aptNm, hi.buildYear, CONCAT(hi.sggCd, hi.umdCd) "
             + "HAVING MIN(CAST(REPLACE(hd.dealAmount, ',', '') AS integer)) >= :minPrice "
             + "AND MAX(CAST(REPLACE(hd.dealAmount, ',', '') AS integer)) <= :maxPrice")
-    List<Tuple> findByDongAndAptName(@Param("dongCode") String dongCode,
+    List<Tuple> findByDongAndAptName(@Param("sido") String sido,
+                                     @Param("gugun") String gugun,
+                                     @Param("dongCode") String dongCode,
                                      @Param("aptName") String aptName,
                                      @Param("minPrice") int minPrice,
                                      @Param("maxPrice") int maxPrice);
@@ -41,7 +43,7 @@ public interface AptRepository extends JpaRepository<AptInfos, String> {
             + "hi.buildYear, "
             + "MAX(hd.excluUseAr), "
             + "MIN(hd.excluUseAr), "
-            + "CONCAT(hi.roadNm,' ', hi.roadNmBonbun), "
+            + "CONCAT(:sido,' ',:gugun ,' ',hi.roadNm,' ', hi.roadNmBonbun), "
             + "MAX(CAST(REPLACE(hd.dealAmount, ',', '') AS integer)), "
             + "MIN(CAST(REPLACE(hd.dealAmount, ',', '') AS integer)) "
             + "FROM AptDeals hd "
@@ -50,7 +52,9 @@ public interface AptRepository extends JpaRepository<AptInfos, String> {
             + "GROUP BY hi.aptSeq, hi.aptNm, hi.buildYear, CONCAT(hi.sggCd, hi.umdCd) "
             + "HAVING MIN(CAST(REPLACE(hd.dealAmount, ',', '') AS integer)) >= :minPrice "
             + "AND MAX(CAST(REPLACE(hd.dealAmount, ',', '') AS integer)) <= :maxPrice")
-    List<Tuple> findByDong(@Param("dongCode") String dongCode,
+    List<Tuple> findByDong(@Param("sido") String sido,
+                           @Param("gugun") String gugun,
+                           @Param("dongCode") String dongCode,
                            @Param("minPrice") int minPrice,
                            @Param("maxPrice") int maxPrice);
 
@@ -60,7 +64,7 @@ public interface AptRepository extends JpaRepository<AptInfos, String> {
             + "hi.buildYear, "
             + "MAX(hd.excluUseAr), "
             + "MIN(hd.excluUseAr), "
-            + "CONCAT(hi.roadNm,' ',hi.roadNmBonbun), "
+            + "CONCAT(:sido,' ',:gugun, ' ' ,hi.roadNm,' ',hi.roadNmBonbun), "
             + "MAX(CAST(REPLACE(hd.dealAmount, ',', '') AS integer )),"
             + "MIN(CAST(REPLACE(hd.dealAmount, ',', '') AS integer )) "
             + "FROM AptDeals hd "
@@ -69,7 +73,9 @@ public interface AptRepository extends JpaRepository<AptInfos, String> {
             + "GROUP BY hi.aptSeq, hi.aptNm, hi.buildYear, CONCAT(hi.sggCd, hi.umdCd) "
             + "HAVING MIN(CAST(REPLACE(hd.dealAmount, ',', '') AS integer )) >= :minPrice "
             + "AND MAX(CAST(REPLACE(hd.dealAmount, ',', '') AS integer )) <= :maxPrice")
-    List<Tuple> findBySidoAndGugun(@Param("dongCodes") List<String> dongCodes,
+    List<Tuple> findBySidoAndGugun(@Param("sido") String sido,
+                                   @Param("gugun") String gugun,
+                                   @Param("dongCodes") List<String> dongCodes,
                                    @Param("minPrice") int minPrice,
                                    @Param("maxPrice") int maxPrice);
 
@@ -81,7 +87,7 @@ public interface AptRepository extends JpaRepository<AptInfos, String> {
             + "hi.buildYear, "
             + "MAX(hd.excluUseAr), "
             + "MIN(hd.excluUseAr), "
-            + "CONCAT(hi.roadNm,' ', hi.roadNmBonbun), "
+            + "CONCAT(:sido,' ',:gugun, ' ', hi.roadNm,' ', hi.roadNmBonbun), "
             + "MAX(CAST(REPLACE(hd.dealAmount, ',', '') AS integer)), "
             + "MIN(CAST(REPLACE(hd.dealAmount, ',', '') AS integer)) "
             + "FROM AptDeals hd "
@@ -91,10 +97,14 @@ public interface AptRepository extends JpaRepository<AptInfos, String> {
             + "GROUP BY hi.aptSeq, hi.aptNm, hi.buildYear, CONCAT(hi.sggCd, hi.umdCd) "
             + "HAVING MIN(CAST(REPLACE(hd.dealAmount, ',', '') AS integer)) >= :minPrice "
             + "AND MAX(CAST(REPLACE(hd.dealAmount, ',', '') AS integer)) <= :maxPrice")
-    List<Tuple> findBySidoAndGugunAndAptName(@Param("dongCodes") List<String> dongCodes,
+    List<Tuple> findBySidoAndGugunAndAptName(@Param("sido") String sido,
+                                             @Param("gugun") String gugun,
+                                             @Param("dongCodes") List<String> dongCodes,
                                              @Param("aptName") String aptName,
                                              @Param("minPrice") int minPrice,
                                              @Param("maxPrice") int maxPrice);
 
+
     AptInfos findByAptSeq(String aptSeq);
+
 }

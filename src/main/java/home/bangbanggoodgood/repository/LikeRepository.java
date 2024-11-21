@@ -20,7 +20,7 @@ public interface LikeRepository extends JpaRepository<Likes, Long> {
             + "hi.buildYear, "
             + "MAX(hd.excluUseAr), "
             + "MIN(hd.excluUseAr), "
-            + "CONCAT(hi.roadNm,' ', hi.roadNmBonbun), "
+            + "CONCAT(:sidoAndGugun,' ',hi.roadNm,' ', hi.roadNmBonbun), "
             + "MAX(CAST(REPLACE(hd.dealAmount, ',', '') AS integer)), "
             + "MIN(CAST(REPLACE(hd.dealAmount, ',', '') AS integer)) "
             + "FROM AptDeals hd "
@@ -28,5 +28,12 @@ public interface LikeRepository extends JpaRepository<Likes, Long> {
             + "JOIN Likes l ON l.aptInfo = hi "
             + "WHERE l.member.id = :memberId "
             + "GROUP BY hi.aptSeq, hi.aptNm, hi.buildYear, CONCAT(hi.sggCd, hi.umdCd) ")
-    List<Tuple> findAptInfosByMemberId(@Param("memberId") Long memberId);
+    List<Tuple> findAptInfosByMemberId(@Param("memberId") Long memberId,
+                                       @Param("sidoAndGugun") String sidoAndGugun);
+
+
+    @Query("Select CONCAT(l.aptInfo.sggCd, l.aptInfo.umdCd)"
+            + "FROM Likes l "
+            + "Where l.member.id = :memberId")
+    List<String> findDongCodeByAptInfos(@Param("memberId") Long memberId);
 }
