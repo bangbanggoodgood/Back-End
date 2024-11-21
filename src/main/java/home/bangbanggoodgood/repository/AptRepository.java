@@ -107,4 +107,21 @@ public interface AptRepository extends JpaRepository<AptInfos, String> {
 
     AptInfos findByAptSeq(String aptSeq);
 
+
+    @Query("SELECT "
+            + "CONCAT(d.sidoName, ' ', d.gugunName, ' ', d.dongName)"
+            + "FROM DongCode d "
+            + "JOIN AptInfos hi ON hi.aptSeq = :aptSeq "
+            + "WHERE d.dongCode = CONCAT(hi.sggCd, hi.umdCd)"
+            )
+    String findDongCodeByAptSeq(@Param("aptSeq") String aptSeq);
+
+
+
+    @Query("SELECT a.buildYear FROM AptInfos a WHERE a.aptSeq = :aptSeq")
+    Integer findBuildYearByAptSeq(@Param("aptSeq") String aptSeq);
+
+    @Query("SELECT a.comment FROM AptInfos a WHERE a.aptSeq = :aptSeq")
+    String findCommentByAptSeq(@Param("aptSeq") String aptSeq);
+
 }

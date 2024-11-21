@@ -63,4 +63,6 @@ public class AptInfos {
     public void updateCount(Long newCount) {
         this.count += newCount;
     }
+
+    public void updateComment(String comment) {this.comment = comment;}
 }
