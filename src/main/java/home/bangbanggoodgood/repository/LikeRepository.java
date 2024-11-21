@@ -36,4 +36,6 @@ public interface LikeRepository extends JpaRepository<Likes, Long> {
             + "FROM Likes l "
             + "Where l.member.id = :memberId")
     List<String> findDongCodeByAptInfos(@Param("memberId") Long memberId);
+
+    Optional<Likes> findByMember_IdAndAptInfo_AptSeq(Long memberId, String aptSeq);
 }

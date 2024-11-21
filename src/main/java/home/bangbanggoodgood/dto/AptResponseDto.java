@@ -21,6 +21,6 @@ public class AptResponseDto {
     int maxDealAmount;
     int minDealAmount;
    // String comment;
-   // int likeCount;
+    Long like;
 
 }
