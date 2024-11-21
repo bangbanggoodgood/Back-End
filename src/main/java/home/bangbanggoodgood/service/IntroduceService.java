@@ -62,7 +62,7 @@ public class IntroduceService {
         return localName;
     }
 
-    private String sendToGpt(String aptSeq) {
+    public String sendToGpt(String aptSeq) {
         String prompt = generatePrompt(aptSeq);  // prompt 생성
 
         HttpHeaders headers = gptConfig.httpHeaders();  // HTTP 헤더 설정
