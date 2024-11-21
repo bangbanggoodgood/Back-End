@@ -47,9 +47,9 @@ public class AptService {
     private List<AptResponseDto> findDealListWithOneDongCode(AptRequestDto dto, String dongCode, int targetMinPrice, int targetMaxPrice) {
         List<Tuple> tuples = null;
         if(dto.getAptName() != null) { // 아파트 이름이 입력 됐다면
-            tuples = aptRepository.findByDongAndAptName(dongCode, dto.getAptName(), targetMinPrice, targetMaxPrice);
+            tuples = aptRepository.findByDongAndAptName(dto.getSidoName(), dto.getGugunName() ,dongCode, dto.getAptName(), targetMinPrice, targetMaxPrice);
         } else {
-            tuples = aptRepository.findByDong(dongCode, targetMinPrice, targetMaxPrice);
+            tuples = aptRepository.findByDong(dto.getSidoName(), dto.getGugunName(), dongCode, targetMinPrice, targetMaxPrice);
         }
         List<AptResponseDto> result = getResult(tuples);
         return result;
@@ -58,9 +58,9 @@ public class AptService {
     private List<AptResponseDto> findDealListWithDongCodes(AptRequestDto dto, List<String> dongCodes, int targetMinPrice, int targetMaxPrice) {
         List<Tuple> tuples = null;
         if(dto.getAptName() != null) {
-            tuples = aptRepository.findBySidoAndGugunAndAptName(dongCodes, dto.getAptName(), targetMinPrice, targetMaxPrice);
+            tuples = aptRepository.findBySidoAndGugunAndAptName(dto.getSidoName(), dto.getGugunName(), dongCodes, dto.getAptName(), targetMinPrice, targetMaxPrice);
         } else {
-            tuples = aptRepository.findBySidoAndGugun(dongCodes, targetMinPrice, targetMaxPrice);
+            tuples = aptRepository.findBySidoAndGugun(dto.getSidoName(), dto.getGugunName(), dongCodes, targetMinPrice, targetMaxPrice);
         }
         List<AptResponseDto> result = getResult(tuples);
         return result;

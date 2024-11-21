@@ -24,4 +24,11 @@ public interface InfoRepository extends JpaRepository<DongCode, String> {
 
     @Query("SELECT d.dongCode FROM DongCode d WHERE d.sidoName = :sido And d.gugunName = :gugun")
     List<String> findDongCodesBySidoNameAndGugunName(@Param("sido") String sido, @Param("gugun") String gugun);
+
+    @Query("SELECT d.sidoName From DongCode d WHERE d.dongCode = :dongCode ")
+    String findSidoNameByDongCode(@Param("dongCode") String dongCode);
+
+    @Query("SELECT d.gugunName FROM DongCode d WHERE d.sidoName = :sidoName AND d.dongCode = :dongCode")
+    String findGugunNameByDongCodeAndSidoName(@Param("sidoName") String sidoName, @Param("dongCode") String dongCode);
+
 }
