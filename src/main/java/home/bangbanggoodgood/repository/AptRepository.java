@@ -124,4 +124,7 @@ public interface AptRepository extends JpaRepository<AptInfos, String> {
     @Query("SELECT a.comment FROM AptInfos a WHERE a.aptSeq = :aptSeq")
     String findCommentByAptSeq(@Param("aptSeq") String aptSeq);
 
+    // comment가 null이 아닌 AptInfos 조회
+    @Query("SELECT a FROM AptInfos a WHERE a.comment IS NOT NULL")
+    List<AptInfos> findByCommentIsNotNull();
 }
