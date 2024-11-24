@@ -21,7 +21,7 @@ public class Members {
     private Long id;
 
     @Column(name = "social_id")
-    Long socialId;
+    String socialId;
 
     @Column(name="name")
     @Nullable
@@ -38,6 +38,10 @@ public class Members {
     @Column(name="job")
     @Nullable
     private String job;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name="authority")
+    private Authority authority;
 
     @Column(name="is_survey")
     @Nullable

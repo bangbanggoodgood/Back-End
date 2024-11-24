@@ -6,7 +6,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import home.bangbanggoodgood.config.AuthTokens;
 import home.bangbanggoodgood.config.AuthTokensGenerator;
+import home.bangbanggoodgood.domain.Authority;
 import home.bangbanggoodgood.domain.Members;
+import home.bangbanggoodgood.dto.CustomMemberInfoDto;
 import home.bangbanggoodgood.dto.LoginResponseDto;
 import home.bangbanggoodgood.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -41,13 +43,10 @@ public class KakaoService {
     private String redirectURI;
 
     public LoginResponseDto kakaoLogin(String code) {
-
         // 인가 코드로 액세스 토큰 요청
         String accessToken = getAccessToken(code);
-
         // 토큰으로 카카오 API 호출
         HashMap<String, Object> userInfo = getKakaoUserInfo(accessToken);
-
         // 카카오 ID로 회원가입 & 로직 처리
         LoginResponseDto kakaoLoginResponseDto = kakaoUserLogin(userInfo);
 
@@ -56,16 +55,18 @@ public class KakaoService {
     }
 
     private LoginResponseDto kakaoUserLogin(HashMap<String, Object> userInfo) {
-        Long socialId = Long.valueOf(userInfo.get("socialId").toString());
-
+        String socialId = userInfo.get("socialId").toString();
         Members member = memberRepository.findBySocialId(socialId);
         if(member == null) {
             member = new Members();
             member.setSocialId(socialId);
+            member.setAuthority(Authority.USER);
             member.setIsSurvey(false);
             memberRepository.save(member);
         }
-        AuthTokens token = authTokensGenerator.generate(socialId.toString());
+
+        CustomMemberInfoDto customMemberInfoDto = new CustomMemberInfoDto(member.getId(), socialId, member.getAuthority());
+        AuthTokens token = authTokensGenerator.generate(customMemberInfoDto);
 
         LoginResponseDto responseDto = new LoginResponseDto(socialId, token.getAccessToken());
         return responseDto;

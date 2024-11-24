@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface MemberRepository extends JpaRepository<Members, Long> {
     Members findMemberById(Long id);
 
-    Members findBySocialId(Long socialId);
+    Members findBySocialId(String socialId);
 }
