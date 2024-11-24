@@ -9,4 +9,6 @@ public interface MemberRepository extends JpaRepository<Members, Long> {
     Members findMemberById(Long id);
 
     Members findBySocialId(String socialId);
+
+    boolean existsByUseId(String useId);
 }

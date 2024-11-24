@@ -47,6 +47,10 @@ public class Members {
     @Nullable
     private Boolean isSurvey;
 
+    @Column(name = "use_id")
+    @Nullable
+    private String useId;
+
     @OneToMany(mappedBy = "member")
     private List<Likes> likes;
 }

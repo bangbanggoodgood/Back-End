@@ -26,7 +26,6 @@ public class UserController {
     public void kakaoLogin(@RequestParam String code, HttpServletResponse response) throws IOException {
         LoginResponseDto responseDto = kakaoService.kakaoLogin(code);
         String socialId = responseDto.getId();
-        System.out.println("초기 소셜 아이디 받아와 지는지 : " + socialId);
         String accessToken = responseDto.getAccessToken();
         Members member = memberRepository.findBySocialId(socialId);
 
@@ -43,5 +42,6 @@ public class UserController {
         }
 
     }
+
 }
 
