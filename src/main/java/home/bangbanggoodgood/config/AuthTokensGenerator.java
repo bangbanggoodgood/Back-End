@@ -1,5 +1,6 @@
 package home.bangbanggoodgood.config;
 
+import home.bangbanggoodgood.dto.CustomMemberInfoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -16,12 +17,11 @@ public class AuthTokensGenerator {
     private final JwtTokenProvider jwtTokenProvider;
 
     // id로 Access Token 생성
-    public AuthTokens generate(String memberId) {
+    public AuthTokens generate(CustomMemberInfoDto customMemberInfoDto) {
         long now = (new Date()).getTime();
         Date accessTokenExpiredAt = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
-
-        String accessToken = jwtTokenProvider.accessTokenGenerate(memberId, accessTokenExpiredAt);
-
+        String accessToken = jwtTokenProvider.accessTokenGenerate(customMemberInfoDto, accessTokenExpiredAt);
+        System.out.println("생성 access 토큰 : " + accessToken);
         return AuthTokens.of(accessToken);
     }
 }
