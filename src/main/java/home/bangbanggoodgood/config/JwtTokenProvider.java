@@ -74,8 +74,6 @@ public class JwtTokenProvider {
     // JWT의 페이로드에서 클레임을 추출하는 코드 . 페이로드 == 클레임
     public Claims parseClaims(String accessToken) {
         try {
-
-            System.out.println("jwt 파싱 키 " + key);
             return Jwts.parserBuilder() // JWT 파서를 생성
                     .setSigningKey(key) // 서명 검증에 사용할 키를 설정
                     .build()
