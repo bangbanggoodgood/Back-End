@@ -135,4 +135,9 @@ public interface AptRepository extends JpaRepository<AptInfos, String> {
     // comment가 null이 아닌 AptInfos 조회
     @Query("SELECT a FROM AptInfos a WHERE a.comment IS NOT NULL")
     List<AptInfos> findByCommentIsNotNull();
+
+    @Query("SELECT i.cluster FROM Infras i JOIN AptInfos hi ON CONCAT(hi.sggCd, hi.umdCd) = CAST(i.id AS string) WHERE CONCAT(hi.sggCd, hi.umdCd) = :dongCode")
+    Long findClusterNumByDongCode(@Param("dongCode") String dongCode);
+
+
 }

@@ -8,6 +8,7 @@ import home.bangbanggoodgood.dto.*;
 import home.bangbanggoodgood.repository.*;
 import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -23,17 +24,18 @@ public class LikeService {
     private final InfoRepository infoRepository;
     private final LikeRepository likeRepository;
     private final InfraRepository infraRepository;
+    private final HashTagsRepository hashTagRepository;  // 해시태그 관련 리포지토리 추가
 
     public LikeResponseDto postLike(Long memberId, LikeRequestDto requestDto) {
         Members members = memberRepository.findMemberById(memberId);
         AptInfos infos = aptRepository.findByAptSeq(requestDto.getAptSeq());
         Optional<Likes> likes = repository.findByMemberAndAptInfo_AptSeq(members, requestDto.getAptSeq());
-        if(likes.isEmpty()) {
+        if (likes.isEmpty()) {
             repository.save(LikeDto.toEntity(members, infos));
-            infos.updateCount(1l);
+            infos.updateCount(1L);
         } else {
             repository.deleteById(likes.get().getId());
-            infos.updateCount(0l);
+            infos.updateCount(0L);
         }
 
         return new LikeResponseDto(infos.getCount());
@@ -53,16 +55,17 @@ public class LikeService {
             // 아파트에 해당하는 동 코드 목록을 가져옵니다.
             String aptSeq = tuple.get(0, String.class);  // aptSeq
             String dongCode = aptRepository.findDongCodeByAptSeq(aptSeq); // 동 코드 목록을 가져옴
-
+            Long clusterId = aptRepository.findClusterNumByDongCode(dongCode);
             // 동 코드별로 인프라 정보를 조회
-            System.out.println("동 코드 : " + dongCode);
             Infras infra = infraRepository.findByDongCode(Long.valueOf(dongCode));
             List<Infras> infraList = Collections.singletonList(infra);  // 단일 객체를 리스트로 변환
             Map<String, Integer> infraResult = getInfraMap(infraList);  // 수정된 코드
 
-
             // 좋아요 여부 확인
             Long like = isLikeNow(aptSeq, memberId);
+
+            // 해시태그 처리
+            List<String> hashtags = hashTagRepository.findHashTagsById(clusterId + 1);
 
             // AptResponseDto를 생성하여 결과 목록에 추가
             result.add(new AptResponseDto(
@@ -73,6 +76,7 @@ public class LikeService {
                     tuple.get(4, BigDecimal.class), // minArea
                     tuple.get(5, String.class),  // address
                     infraResult,  // 인프라 정보 Map 추가
+                    hashtags,  // 해시태그 목록 추가
                     tuple.get(6, Integer.class), // maxDealAmount
                     tuple.get(7, Integer.class), // minDealAmount
                     like  // 좋아요 여부
@@ -91,7 +95,6 @@ public class LikeService {
             String gugunName = infoRepository.findGugunNameByDongCodeAndSidoName(sidoName, dong);
             String sidoGugun = sidoName + " " + gugunName;
 
-            System.out.println("dong: " + dong + ", sidoName: " + sidoName + ", gugunName: " + gugunName);
             tuples = repository.findAptInfosByMemberId(memberId, sidoGugun);
         }
 
@@ -141,4 +144,5 @@ public class LikeService {
 
         return infraMap;
     }
+
 }
