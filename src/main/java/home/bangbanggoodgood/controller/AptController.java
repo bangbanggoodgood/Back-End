@@ -1,5 +1,6 @@
 package home.bangbanggoodgood.controller;
 
+import home.bangbanggoodgood.config.JwtTokenProvider;
 import home.bangbanggoodgood.dto.AptFinalResponseDto;
 import home.bangbanggoodgood.dto.AptRequestDto;
 import home.bangbanggoodgood.dto.AptResponseDto;
@@ -18,12 +19,18 @@ import java.util.List;
 public class AptController {
 
     private final AptService aptService;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    @PostMapping("/{memberId}")
-    public ResponseEntity<AptFinalResponseDto> getDealList(@RequestParam String presentPage,
+    @PostMapping()
+    public ResponseEntity<AptFinalResponseDto> getDealList(@RequestHeader("Authorization") String authorizationHeader,
+                                                           @RequestParam String presentPage,
                                                             @RequestParam String limit,
-                                                            @PathVariable Long memberId,
                                                             @RequestBody AptRequestDto requestDto) {
+        // 토큰 추출
+        String token = authorizationHeader.replace("Bearer ", "");
+
+        // 사용자 아이디 추출
+        Long memberId = jwtTokenProvider.parseMemberId(token);
         AptFinalResponseDto result = aptService.show(requestDto, memberId);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
