@@ -11,6 +11,11 @@ import java.util.List;
 
 @Repository
 public interface AptDealRepository extends JpaRepository<AptDeals, Long> {
+
+    // AptSeq로 AptDeals 조회
+    List<AptDeals> findByAptSeq(String aptSeq);
+
+    // 이미 정의된 쿼리들
     @Query("SELECT CONCAT(CAST(ad.dealYear AS string), LPAD(CAST(ad.dealMonth AS string), 2, '0')) AS yearMonth, "
             + "AVG(CAST(REPLACE(ad.dealAmount, ',', '') AS double)) AS avgDealAmount "
             + "FROM AptDeals ad "
@@ -34,6 +39,11 @@ public interface AptDealRepository extends JpaRepository<AptDeals, Long> {
             + "WHERE ad.aptSeq = :aptSeq "
             + "ORDER BY ad.dealYear DESC, ad.dealMonth DESC")
     List<Tuple> findDealsTable(@Param("aptSeq") String aptSeq);
+
+    @Query("SELECT AVG(CAST(REPLACE(ad.dealAmount, ',', '') AS double)) " +
+            "FROM AptDeals ad WHERE ad.aptSeq = :aptSeq")
+    Double findAveragePriceByAptSeq(@Param("aptSeq") String aptSeq);
+
 
 
 }
