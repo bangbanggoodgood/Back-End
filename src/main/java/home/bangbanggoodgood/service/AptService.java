@@ -16,14 +16,13 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class AptService {
-
     private final AptRepository aptRepository;
     private final InfoService infoService;
     private final LikeRepository likeRepository;
     private final MemberRepository memberRepository;
-    private final InfraRepository infraRepository;
-    private final ClusterRepository clusterRepository;
-    private final HashTagsRepository hashTagsRepository;
+    private final TimeDataService timeDataService; // TimeDataService 추가
+    private final InfraRepository infraRepository;  // InfraRepository 추가
+    private final HashTagsRepository hashTagsRepository; // HashTagsRepository 추가
 
     public AptFinalResponseDto show(AptRequestDto dto, Long memberId) {
         List<String> dongCodes;
@@ -33,15 +32,14 @@ public class AptService {
         List<AptResponseDto> result = null;
 
         // 가격 범위 설정
-        if(dto.getTargetMinPrice() != -1) {
+        if (dto.getTargetMinPrice() != -1) {
             targetMinPrice = dto.getTargetMinPrice();
         }
-        if(dto.getTargetMaxPrice() != -1) {
+        if (dto.getTargetMaxPrice() != -1) {
             targetMaxPrice = dto.getTargetMaxPrice();
         }
 
-        // 동 코드가 '전체'일 때
-        if(dto.getDongName().equals("전체")) {
+        if (dto.getDongName().equals("전체")) { // 전체 동에 대해 처리
             dongCodes = infoService.findDongCodes(dto.getSidoName(), dto.getGugunName());
             result = findDealListWithDongCodes(dto, dongCodes, targetMinPrice, targetMaxPrice, memberId);
         } else {
@@ -49,34 +47,103 @@ public class AptService {
             result = findDealListWithOneDongCode(dto, dongCode, targetMinPrice, targetMaxPrice, memberId);
         }
 
+        // 체류시간이 가장 긴 아파트를 찾고, 해당 아파트 특성을 가져와서 리스트를 정렬
+        AptInfos recommendedApt = timeDataService.recommendApts(memberId); // 시간 기반 추천 아파트 찾기
+        if (recommendedApt != null) {
+            String aptSeq = recommendedApt.getAptSeq();
+            String dongCodeForCluster = aptRepository.findDongCodeByAptSeq(aptSeq);
+            Long clusterId = aptRepository.findClusterNumByDongCode(dongCodeForCluster);
+            Integer[] priceRange = getPriceRangeForApt(aptSeq);
+
+            // 정렬 전 디버깅 로그 추가
+            System.out.println("=======================================================================================================");
+            System.out.println("Before sorting: " + result);
+            System.out.println("=======================================================================================================");
+
+            result.sort((apt1, apt2) -> {
+                int priceComparison = compareByPriceRange(apt1, apt2, priceRange);
+                if (priceComparison != 0) {
+                    return priceComparison;
+                }
+                return compareByCluster(apt1, apt2, clusterId);
+            });
+
+            // 정렬 후 디버깅 로그 추가
+            System.out.println("=======================================================================================================");
+            System.out.println("After sorting: " + result);
+            System.out.println("=======================================================================================================");
+        } else {
+            System.out.println("=======================================================================================================");
+            System.out.println("이거 뜨면 Null");
+            System.out.println("=======================================================================================================");
+        }
+
         int total = result.size();
         return new AptFinalResponseDto(total, result);
     }
 
+    // 아파트의 가격대 비교
+    private int compareByPriceRange(AptResponseDto apt1, AptResponseDto apt2, Integer[] priceRange) {
+        Integer apt1MinPrice = apt1.getMinDealAmount();
+        Integer apt1MaxPrice = apt1.getMaxDealAmount();
+        Integer apt2MinPrice = apt2.getMinDealAmount();
+        Integer apt2MaxPrice = apt2.getMaxDealAmount();
+
+        // 가격대에 따라 정렬
+        int apt1InPriceRange = (apt1MinPrice >= priceRange[0] && apt1MaxPrice <= priceRange[1]) ? 1 : 0;
+        int apt2InPriceRange = (apt2MinPrice >= priceRange[0] && apt2MaxPrice <= priceRange[1]) ? 1 : 0;
+
+        if (apt1InPriceRange == apt2InPriceRange) {
+            // 가격대가 비슷한 아파트끼리 더 정확히 비교 (추천 아파트와 차이가 적은 아파트 우선)
+            int apt1PriceDiff = Math.abs(apt1MinPrice - priceRange[0]) + Math.abs(apt1MaxPrice - priceRange[1]);
+            int apt2PriceDiff = Math.abs(apt2MinPrice - priceRange[0]) + Math.abs(apt2MaxPrice - priceRange[1]);
+            return Integer.compare(apt1PriceDiff, apt2PriceDiff); // 차이가 적은 가격대 우선
+        }
+
+        return Integer.compare(apt2InPriceRange, apt1InPriceRange); // 체류시간이 긴 아파트가 가격대가 일치하면 우선
+    }
+
+    // 클러스터 ID 비교
+    private int compareByCluster(AptResponseDto apt1, AptResponseDto apt2, Long clusterId) {
+        // aptSeq를 사용해서 동코드를 조회
+        String apt1DongCode = aptRepository.findDongCodeByAptSeq(apt1.getAptSeq());
+        String apt2DongCode = aptRepository.findDongCodeByAptSeq(apt2.getAptSeq());
+
+        Long apt1Cluster = aptRepository.findClusterNumByDongCode(apt1DongCode);
+        Long apt2Cluster = aptRepository.findClusterNumByDongCode(apt2DongCode);
+
+        if (apt1Cluster.equals(apt2Cluster)) {
+            return 0; // 클러스터 ID가 같으면 동일한 그룹으로 처리
+        }
+
+        return Long.compare(apt2Cluster, apt1Cluster); // 클러스터 ID가 높은 순으로 정렬
+    }
+
+    // 해당 아파트의 가격대 반환 (최소 가격, 최대 가격)
+    private Integer[] getPriceRangeForApt(String aptSeq) {
+        Tuple priceTuple = aptRepository.findPriceRangeByAptSeq(aptSeq);
+        Integer minPrice = priceTuple.get(0, Integer.class);
+        Integer maxPrice = priceTuple.get(1, Integer.class);
+        return new Integer[]{minPrice, maxPrice};
+    }
     private List<AptResponseDto> findDealListWithOneDongCode(AptRequestDto dto, String dongCode, int targetMinPrice, int targetMaxPrice, Long memberId) {
         List<Tuple> tuples = null;
-
-        // 아파트 이름이 있는 경우와 없는 경우로 분리하여 쿼리
         if(dto.getAptName() != null) {
             tuples = aptRepository.findByDongAndAptName(dto.getSidoName(), dto.getGugunName(), dongCode, dto.getAptName(), targetMinPrice, targetMaxPrice);
         } else {
             tuples = aptRepository.findByDong(dto.getSidoName(), dto.getGugunName(), dongCode, targetMinPrice, targetMaxPrice);
         }
-
         List<AptResponseDto> result = getResult(tuples, dongCode, memberId);
         return result;
     }
 
     private List<AptResponseDto> findDealListWithDongCodes(AptRequestDto dto, List<String> dongCodes, int targetMinPrice, int targetMaxPrice, Long memberId) {
         List<Tuple> tuples = null;
-
-        // 아파트 이름이 있는 경우와 없는 경우로 분리하여 쿼리
         if(dto.getAptName() != null) {
             tuples = aptRepository.findBySidoAndGugunAndAptName(dto.getSidoName(), dto.getGugunName(), dongCodes, dto.getAptName(), targetMinPrice, targetMaxPrice);
         } else {
             tuples = aptRepository.findBySidoAndGugun(dto.getSidoName(), dto.getGugunName(), dongCodes, targetMinPrice, targetMaxPrice);
         }
-
         List<AptResponseDto> result = getResult(tuples, dongCodes, memberId);
         return result;
     }
@@ -112,7 +179,7 @@ public class AptService {
             System.out.println("clusterId : " + clusterId);
             List<String> hashtags = hashTagsRepository.findHashTagsById(clusterId + 1);
             System.out.println("hashtags : " + hashtags);
-            // 해시태그는 이미 List<String> 형태이므로 그대로 사용하면 됩니다.
+
             result.add(new AptResponseDto(
                     aptSeq, // aptSeq
                     tuple.get(1, String.class),  // aptNm
@@ -129,11 +196,6 @@ public class AptService {
         }
         return result;
     }
-
-
-
-
-
 
     private Long isLikeNow(String aptSeq, Long memberId) {
         Members members = memberRepository.findMemberById(memberId);
@@ -170,7 +232,5 @@ public class AptService {
         }
         return infraMap;
     }
-
-
-
 }
+
