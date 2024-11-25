@@ -1,11 +1,13 @@
 package home.bangbanggoodgood.domain;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 
 @Entity
 @Table(name="housedeals")
+@Getter
 public class AptDeals {
 
     @Id

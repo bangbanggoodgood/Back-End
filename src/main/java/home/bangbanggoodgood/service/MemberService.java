@@ -1,12 +1,15 @@
 package home.bangbanggoodgood.service;
 
 import home.bangbanggoodgood.domain.Members;
+import home.bangbanggoodgood.domain.Statistics;
 import home.bangbanggoodgood.dto.*;
 import home.bangbanggoodgood.repository.MemberRepository;
+import home.bangbanggoodgood.repository.StatisticsRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
@@ -15,6 +18,7 @@ import java.util.Optional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final StatisticsRepository statisticsRepository;
 
     public SignUpResponseDto signUp(MemberSignUpRequestDto requestDto, Long memberId) {
         Optional<Members> member = memberRepository.findById(memberId);
@@ -33,7 +37,37 @@ public class MemberService {
         members.setIsSurvey(true);
         memberRepository.save(members);
 
+        updateStatistics("sex", requestDto.getSex());
+        updateStatistics("age", getAgeGroup(requestDto.getBirth()));
+
         return new SignUpResponseDto(members.getId());
+    }
+
+    private String getAgeGroup(String birth) {
+        int birthYear = Integer.parseInt(birth.substring(0, 4)); // 생년 추출
+        int currentYear = LocalDate.now().getYear();
+        int age = currentYear - birthYear;
+
+        if (age < 20) return "10대";
+        if (age < 30) return "20대";
+        if (age < 40) return "30대";
+        if (age < 50) return "40대";
+        if (age < 60) return "50대";
+        if (age < 70) return "60대";
+        return "70대 이상";
+    }
+
+    private void updateStatistics(String category, String subCategory) {
+        Statistics statistics = statisticsRepository.findByCategoryAndSubCategory(category, subCategory)
+                .orElseGet(() -> {
+                    Statistics newStat = new Statistics();
+                    newStat.setCategory(category);
+                    newStat.setSubCategory(subCategory);
+                    newStat.setCount(0);
+                    return newStat;
+                });
+        statistics.setCount(statistics.getCount() + 1);
+        statisticsRepository.save(statistics);
     }
 
     private boolean isValidId(String useId) {
