@@ -13,7 +13,7 @@ public interface InfoRepository extends JpaRepository<DongCode, String> {
     @Query("SELECT DISTINCT d.sidoName FROM DongCode d")
     List<String> findAllSidoName();
 
-    @Query("SELECT d.dongName FROM DongCode d WHERE d.sidoName = :sido")
+    @Query("SELECT DISTINCT d.gugunName FROM DongCode d WHERE d.sidoName = :sido")
     List<String> findGugunNameBySidoName(@Param("sido") String sido);
 
     @Query("SELECT d.dongName FROM DongCode d WHERE d.sidoName = :sido AND d.gugunName = :gugun")
