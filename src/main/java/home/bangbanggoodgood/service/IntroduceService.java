@@ -58,7 +58,7 @@ public class IntroduceService {
     }
 
     private String getLocalInfo(String aptSeq) {
-        String localName = aptRepository.findDongCodeByAptSeq(aptSeq);
+        String localName = aptRepository.findDongNameByAptSeq(aptSeq);
         return localName;
     }
 

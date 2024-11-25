@@ -114,6 +114,14 @@ public interface AptRepository extends JpaRepository<AptInfos, String> {
             + "JOIN AptInfos hi ON hi.aptSeq = :aptSeq "
             + "WHERE d.dongCode = CONCAT(hi.sggCd, hi.umdCd)"
             )
+    String findDongNameByAptSeq(@Param("aptSeq") String aptSeq);
+
+    @Query("SELECT "
+            + "d.dongCode "
+            + "FROM DongCode d "
+            + "JOIN AptInfos hi ON hi.aptSeq = :aptSeq "
+            + "WHERE d.dongCode = CONCAT(hi.sggCd, hi.umdCd)"
+    )
     String findDongCodeByAptSeq(@Param("aptSeq") String aptSeq);
 
 

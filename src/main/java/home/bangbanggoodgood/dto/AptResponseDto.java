@@ -17,10 +17,9 @@ public class AptResponseDto {
     BigDecimal maxArea;
     BigDecimal minArea;
     String address;
-   // Map<String, Integer> infra;
+    Map<String, Integer> infra;
     int maxDealAmount;
     int minDealAmount;
-   // String comment;
     Long like;
 
 }
