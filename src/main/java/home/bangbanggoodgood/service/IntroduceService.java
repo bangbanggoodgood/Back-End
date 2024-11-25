@@ -27,7 +27,6 @@ public class IntroduceService {
         if(info.isPresent()) { // 아파트가 있다
             String comment = aptRepository.findCommentByAptSeq(aptSeq);
             if (comment == null) {
-                System.out.println("이거 찍히면 큰일난거임");
                 String newComment = sendToGpt(aptSeq);
                 AptInfos nowInfo = aptRepository.findByAptSeq(aptSeq);
                 nowInfo.updateComment(newComment);
@@ -58,7 +57,7 @@ public class IntroduceService {
     }
 
     private String getLocalInfo(String aptSeq) {
-        String localName = aptRepository.findDongCodeByAptSeq(aptSeq);
+        String localName = aptRepository.findDongNameByAptSeq(aptSeq);
         return localName;
     }
 
