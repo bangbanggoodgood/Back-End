@@ -15,11 +15,7 @@ public class StatisticsService {
 
     private final StatisticsRepository statisticsRepository;
 
-    /**
-     * 특정 카테고리에 대한 통계 데이터를 조회합니다.
-     */
     public Map<String, Object> getCategoryStatistics(String category) {
-        System.out.println("들어와?");
         List<Statistics> categoryStatistics = statisticsRepository.findByCategory(category);
         System.out.println(categoryStatistics);
 

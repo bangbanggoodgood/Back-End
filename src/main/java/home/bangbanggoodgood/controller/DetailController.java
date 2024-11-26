@@ -29,8 +29,8 @@ public class DetailController {
     @GetMapping("/detailChart")
     public ResponseEntity<DetailFinalResponseDto> getDealChartAmount(@RequestParam String presentPage,
                                                                      @RequestParam String aptSeq,
-                                                                     @RequestParam int limit) {
-        DetailFinalResponseDto result = dealService.getDetailChart(aptSeq);
+                                                                     @RequestParam String limit) {
+        DetailFinalResponseDto result = dealService.getDetailChart(aptSeq, presentPage, limit);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }

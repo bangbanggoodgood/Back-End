@@ -47,7 +47,7 @@ public class DealService {
         return map;
     }
 
-    public DetailFinalResponseDto getDetailChart(String aptSeq) {
+    public DetailFinalResponseDto getDetailChart(String aptSeq, String presentPage, String limit) {
         List<Tuple> result = aptDealRepository.findDealsTable(aptSeq);
 
         List<DetailResponseDto> detailList = new ArrayList<>();
@@ -59,9 +59,16 @@ public class DealService {
             DetailResponseDto detail = new DetailResponseDto(yearMonth, dealAmount, area, floor);
             detailList.add(detail);
         }
+        int presentNum = Integer.parseInt(presentPage);
+        int limitNum = Integer.parseInt(limit);
+
+        int startIdx = (presentNum - 1) * limitNum;
+        int endIdx = Math.min(startIdx + limitNum, detailList.size());
+
+        List<DetailResponseDto> pagedDetailList = detailList.subList(startIdx, endIdx);
 
         int resultRows = result.size();
-        return new DetailFinalResponseDto(resultRows, detailList);
+        return new DetailFinalResponseDto(resultRows, pagedDetailList);
     }
 
 }

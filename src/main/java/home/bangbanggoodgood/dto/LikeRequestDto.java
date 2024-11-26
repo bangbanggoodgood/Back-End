@@ -7,6 +7,5 @@ import lombok.Data;
 
 @Data
 public class LikeRequestDto {
-    Long memberId;
     String aptSeq;
 }
