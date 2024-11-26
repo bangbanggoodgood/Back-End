@@ -1,5 +1,6 @@
 package home.bangbanggoodgood.service;
 
+import home.bangbanggoodgood.config.JwtTokenProvider;
 import home.bangbanggoodgood.domain.Members;
 import home.bangbanggoodgood.domain.Statistics;
 import home.bangbanggoodgood.dto.*;
@@ -66,6 +67,10 @@ public class MemberService {
                     newStat.setCount(0);
                     return newStat;
                 });
+
+        System.out.println("카테고리 : " + category + ", 서브 카테고리 : " + subCategory);
+        System.out.println("현재 카운트 : " + statistics.getCount());
+
         statistics.setCount(statistics.getCount() + 1);
         statisticsRepository.save(statistics);
     }
@@ -103,6 +108,10 @@ public class MemberService {
         boolean isValidId = isValidId(checkRequestDto.getUseId());
         return new CheckResponseDto(isValidId);
     }
-}
 
+    public AdminMemberInfoResponseDto getUserInfoByUseId(AdminMemberInfoRequestDto requestDto) {
+        Members members = memberRepository.findByUseId(requestDto.getUseId());
+        return new AdminMemberInfoResponseDto(members.getName(), members.getBirth(), members.getSex(), members.getJob(), members.getUseId(), members.getAuthority());
+    }
+}
 
