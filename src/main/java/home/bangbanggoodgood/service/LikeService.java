@@ -41,11 +41,16 @@ public class LikeService {
         return new LikeResponseDto(infos.getCount());
     }
 
-    public AptFinalResponseDto getLikes(Long memberId) {
+    public AptFinalResponseDto getLikes(Long memberId, int presentPage, int limit) {
         List<Tuple> tuples = findSidoAndGugun(memberId);
         List<AptResponseDto> result = getResult(tuples, memberId);
+
+        int startIdx = (presentPage - 1) * limit;
+        int endIdx = Math.min(startIdx + limit, result.size());
+
+        List<AptResponseDto> pagedResult = result.subList(startIdx, endIdx);
         int total = result.size();
-        return new AptFinalResponseDto(total, result);
+        return new AptFinalResponseDto(total, pagedResult);
     }
 
     private List<AptResponseDto> getResult(List<Tuple> tuples, Long memberId) {
