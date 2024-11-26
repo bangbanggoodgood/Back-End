@@ -45,5 +45,11 @@ public class AdminController {
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
+    @PostMapping("/authority")
+    public ResponseEntity<?> changeAuthority(@RequestBody AdminMemberInfoRequestDto requestDto) {
+        AdminMemberInfoResponseDto responseDto = memberService.changeAuthority(requestDto);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
+
 
 }
