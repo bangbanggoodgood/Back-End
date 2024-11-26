@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class CheckResponseDto {
-    private boolean isValid;
+   boolean isValid;
 }

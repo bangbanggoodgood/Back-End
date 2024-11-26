@@ -12,7 +12,7 @@ import java.util.Date;
 //토큰을 생성하는 코드
 public class AuthTokensGenerator {
     private static final String BEARER_TYPE = "Bearer";
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 2; // 2일
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60;
 
     private final JwtTokenProvider jwtTokenProvider;
 

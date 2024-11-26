@@ -53,8 +53,8 @@ public class MemberController {
 
     @PostMapping("/check")
     public ResponseEntity<CheckResponseDto> checkValid(@RequestBody CheckRequestDto checkRequestDto) {
-        CheckResponseDto requestDto = memberService.checkVaildId(checkRequestDto);
-        return new ResponseEntity<>(requestDto, HttpStatus.OK);
+        CheckResponseDto responseDto = memberService.checkVaildId(checkRequestDto);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
 }

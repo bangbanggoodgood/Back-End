@@ -78,7 +78,13 @@ public class MemberService {
     }
 
     private boolean isValidId(String useId) {
-        return !memberRepository.existsByUseId(useId);
+        System.out.println("들어오는지 확인");
+        Members members = memberRepository.findByUseId(useId);
+        if(members == null) {
+            System.out.println("nullllllllllllllllllllllllllllllllllllll");
+            return true;
+        }
+        return false;
     }
 
     public MemberInfoResponseDto getUserInfo(Long memberId) {
@@ -107,8 +113,8 @@ public class MemberService {
 
     public CheckResponseDto checkVaildId(CheckRequestDto checkRequestDto) {
         System.out.println("아이디 : " + checkRequestDto.getUseId());
-        boolean isValidId = isValidId(checkRequestDto.getUseId());
-        return new CheckResponseDto(isValidId);
+        boolean result = isValidId(checkRequestDto.getUseId());
+        return new CheckResponseDto(result);
     }
 
     public AdminMemberInfoResponseDto getUserInfoByUseId(AdminMemberInfoRequestDto requestDto) {

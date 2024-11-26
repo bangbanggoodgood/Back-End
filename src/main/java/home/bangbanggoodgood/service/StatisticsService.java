@@ -34,33 +34,9 @@ public class StatisticsService {
         Map<String, Object> result = new HashMap<>();
         result.putAll(subCategoryCounts);  // 서브 카테고리별 카운트
         result.put("total", total);  // 총합
-
-        saveCategoryStatistics(category, subCategoryCounts);
+         
         return result;
     }
 
-    public void saveCategoryStatistics(String category, Map<String, Integer> subCategoryData) {
-        for (Map.Entry<String, Integer> entry : subCategoryData.entrySet()) {
-            String subCategory = entry.getKey();
-            Integer newCount = entry.getValue();
-
-            // 기존 데이터가 있으면 업데이트, 없으면 새로 생성
-            Statistics stat = statisticsRepository.findByCategoryAndSubCategory(category, subCategory)
-                    .orElseGet(() -> {
-                        Statistics newStat = new Statistics();
-                        newStat.setCategory(category);
-                        newStat.setSubCategory(subCategory);
-                        newStat.setCount(0); // 기존 값이 없으면 초기값 0
-                        return newStat;
-                    });
-
-            // 기존 값과 새 값 합산
-            int updatedCount = stat.getCount() + newCount;
-            stat.setCount(updatedCount);
-
-            // 합산된 값 저장
-            statisticsRepository.save(stat);
-        }
-    }
 
 }
