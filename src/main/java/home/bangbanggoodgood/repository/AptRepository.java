@@ -139,5 +139,12 @@ public interface AptRepository extends JpaRepository<AptInfos, String> {
     @Query("SELECT i.cluster FROM Infras i JOIN AptInfos hi ON CONCAT(hi.sggCd, hi.umdCd) = CAST(i.id AS string) WHERE CONCAT(hi.sggCd, hi.umdCd) = :dongCode")
     Long findClusterNumByDongCode(@Param("dongCode") String dongCode);
 
+    // 아파트의 최소 가격과 최대 가격을 조회하는 메서드
+    @Query("SELECT "
+            + "MIN(CAST(REPLACE(hd.dealAmount, ',', '') AS integer)), "
+            + "MAX(CAST(REPLACE(hd.dealAmount, ',', '') AS integer)) "
+            + "FROM AptDeals hd "
+            + "WHERE hd.aptSeq = :aptSeq")
+    Tuple findPriceRangeByAptSeq(@Param("aptSeq") String aptSeq);
 
 }

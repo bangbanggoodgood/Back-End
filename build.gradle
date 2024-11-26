@@ -34,6 +34,8 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+	implementation 'jakarta.persistence:jakarta.persistence-api'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 	implementation 'org.json:json:20231013'
 	compileOnly 'org.projectlombok:lombok'
@@ -42,7 +44,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.batch:spring-batch-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
 }
 
 tasks.named('test') {

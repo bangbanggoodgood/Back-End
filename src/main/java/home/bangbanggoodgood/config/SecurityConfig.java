@@ -26,7 +26,7 @@ public class SecurityConfig {
                                 .requestMatchers("/oauth/kakao")
                                 .permitAll()
                                 .requestMatchers("/admin/**")
-                                .hasRole("ADMIN")
+                                .hasAuthority("ADMIN")
                                 .anyRequest()
                                 .permitAll()
                 )
