@@ -31,9 +31,13 @@ public class JwtAuthFilter extends GenericFilterBean {
 
         String token = resolveToken((HttpServletRequest) servletRequest);
         System.out.println("do 필터 내부 토큰 : " + token);
-        if(token != null && jwtTokenProvider.validateToken(token)) {
-            Authentication authentication = jwtTokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        if(token != null) {
+            boolean isValid = jwtTokenProvider.validateToken(token);
+            System.out.println("isValid = " + isValid);
+            if (isValid) {
+                Authentication authentication = jwtTokenProvider.getAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
         }
         filterChain.doFilter(servletRequest, servletResponse);
     }

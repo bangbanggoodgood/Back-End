@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,13 +36,13 @@ public class JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes); // 비밀 키 생성
     }
 
-    public String accessTokenGenerate(CustomMemberInfoDto customMemberInfoDto, Date expiredAt) {
+    public String accessTokenGenerate(CustomMemberInfoDto customMemberInfoDto, long time) {
         Claims claims = Jwts.claims();
         claims.put("auth", customMemberInfoDto.getAuthority());
         claims.put("memberId", customMemberInfoDto.getMemberId());
         claims.put("sub", customMemberInfoDto.getSocialId());
-        ZonedDateTime now = ZonedDateTime.now();
-        ZonedDateTime expiresAt = now.plusSeconds(expiredAt.getTime() / 1000);
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        ZonedDateTime expiresAt = now.plusSeconds(time / 1000);
         Date expirationDate = Date.from(expiresAt.toInstant());
 
         return Jwts.builder()
