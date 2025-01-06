@@ -35,32 +35,34 @@ public class StatisticsService {
         result.putAll(subCategoryCounts);  // 서브 카테고리별 카운트
         result.put("total", total);  // 총합
 
-        saveCategoryStatistics(category, subCategoryCounts);
+        saveCategoryStatistics(category, subCategoryCounts, categoryStatistics);
         return result;
     }
 
-    public void saveCategoryStatistics(String category, Map<String, Integer> subCategoryData) {
+    public void saveCategoryStatistics(String category, Map<String, Integer> subCategoryData, List<Statistics> existingStatistics) {
+
+        // 2. 기존 데이터를 Map으로 변환 (key: subCategory, value: Statistics 객체)
+        Map<String, Statistics> existingStatisticsMap = new HashMap<>();
+        for (Statistics stat : existingStatistics) {
+            existingStatisticsMap.put(stat.getSubCategory(), stat);
+        }
+
+        // 3. 새로운 데이터를 처리
         for (Map.Entry<String, Integer> entry : subCategoryData.entrySet()) {
             String subCategory = entry.getKey();
-            Integer newCount = entry.getValue();
+            Integer count = entry.getValue();
 
             // 기존 데이터가 있으면 업데이트, 없으면 새로 생성
-            Statistics stat = statisticsRepository.findByCategoryAndSubCategory(category, subCategory)
-                    .orElseGet(() -> {
-                        Statistics newStat = new Statistics();
-                        newStat.setCategory(category);
-                        newStat.setSubCategory(subCategory);
-                        newStat.setCount(0); // 기존 값이 없으면 초기값 0
-                        return newStat;
-                    });
+            Statistics stat = existingStatisticsMap.getOrDefault(subCategory, new Statistics());
+            stat.setCategory(category);
+            stat.setSubCategory(subCategory);
+            stat.setCount(count);
 
-            // 기존 값과 새 값 합산
-            int updatedCount = stat.getCount() + newCount;
-            stat.setCount(updatedCount);
-
-            // 합산된 값 저장
+            // 저장
             statisticsRepository.save(stat);
         }
     }
+
+
 
 }

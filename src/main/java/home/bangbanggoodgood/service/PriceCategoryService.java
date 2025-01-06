@@ -114,23 +114,35 @@ public class PriceCategoryService {
     }
 
     private void updateStatisticsInDatabase(Map<String, Integer> priceCategoryMap) {
+        // 1. 가격 카테고리에 대한 모든 통계 데이터를 한 번에 조회
+        List<Statistics> existingStatistics = statisticsRepository.findByCategory("price");
+
+        // 2. 조회한 데이터를 Map으로 변환 (key: subCategory, value: Statistics 객체)
+        Map<String, Statistics> existingStatisticsMap = new HashMap<>();
+        for (Statistics stat : existingStatistics) {
+            existingStatisticsMap.put(stat.getSubCategory(), stat);
+        }
+
+        // 3. 새로운 데이터를 처리
         for (Map.Entry<String, Integer> entry : priceCategoryMap.entrySet()) {
             String subCategory = entry.getKey();
             Integer count = entry.getValue();
 
-            // 가격 카테고리 통계 조회
-            Statistics stat = statisticsRepository.findByCategoryAndSubCategory("price", subCategory)
-                    .orElseGet(() -> {
-                        Statistics newStat = new Statistics();
-                        newStat.setCategory("price");
-                        newStat.setSubCategory(subCategory);
-                        newStat.setCount(0);
-                        return newStat;
-                    });
-
+            // 4. 기존 데이터가 있으면 업데이트, 없으면 새로 생성
+            Statistics stat = existingStatisticsMap.getOrDefault(subCategory, new Statistics());
+            stat.setCategory("price");
+            stat.setSubCategory(subCategory);
             stat.setCount(count);
-            statisticsRepository.save(stat);
+
+            // 새로 생성된 통계는 기존 리스트에 추가
+            if (!existingStatisticsMap.containsKey(subCategory)) {
+                existingStatisticsMap.put(subCategory, stat);
+            }
         }
+
+        // 5. 변경된 데이터를 한 번에 저장
+        statisticsRepository.saveAll(existingStatisticsMap.values());
     }
+
 }
 
