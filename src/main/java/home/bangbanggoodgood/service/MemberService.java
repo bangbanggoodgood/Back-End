@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,26 +25,24 @@ public class MemberService {
     private final StatisticsRepository statisticsRepository;
 
     public SignUpResponseDto signUp(MemberSignUpRequestDto requestDto, Long memberId) {
-        Optional<Members> member = memberRepository.findById(memberId);
-        if (member.isEmpty()) {
-            throw new RuntimeException("존재하지 않는 유저입니다.");
-        }
+        Members member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 유저입니다."));
+
         if (!isValidId(requestDto.getUseId())) {
             throw new RuntimeException("존재하는 아이디 입니다.");
         }
-        Members members = memberRepository.findMemberById(memberId);
-        members.setJob(requestDto.getJob());
-        members.setBirth(requestDto.getBirth());
-        members.setName(requestDto.getName());
-        members.setUseId(requestDto.getUseId());
-        members.setSex(requestDto.getSex());
-        members.setIsSurvey(true);
-        memberRepository.save(members);
+        member.setJob(requestDto.getJob());
+        member.setBirth(requestDto.getBirth());
+        member.setName(requestDto.getName());
+        member.setUseId(requestDto.getUseId());
+        member.setSex(requestDto.getSex());
+        member.setIsSurvey(true);
+        memberRepository.save(member);
 
         updateStatistics("sex", requestDto.getSex());
         updateStatistics("age", getAgeGroup(requestDto.getBirth()));
 
-        return new SignUpResponseDto(members.getId());
+        return new SignUpResponseDto(member.getId());
     }
 
     private String getAgeGroup(String birth) {
@@ -61,19 +60,20 @@ public class MemberService {
     }
 
     private void updateStatistics(String category, String subCategory) {
-        Statistics statistics = statisticsRepository.findByCategoryAndSubCategory(category, subCategory)
+        // 해당 카테고리에 대한 모든 통계 데이터를 한번에 조회한다.
+        List<Statistics> statisticsList = statisticsRepository.findByCategory(category);
+
+        Statistics statistics = statisticsList.stream().filter(s -> s.getSubCategory().equals(subCategory)).findFirst()
                 .orElseGet(() -> {
-                    Statistics newStat = new Statistics();
-                    newStat.setCategory(category);
-                    newStat.setSubCategory(subCategory);
-                    newStat.setCount(0);
-                    return newStat;
+                    Statistics newStatistics = new Statistics();
+                    newStatistics.setCategory(category);
+                    newStatistics.setSubCategory(subCategory);
+                    newStatistics.setCount(0);
+                    statisticsList.add(newStatistics);
+                    return newStatistics;
                 });
-
-        System.out.println("카테고리 : " + category + ", 서브 카테고리 : " + subCategory);
-        System.out.println("현재 카운트 : " + statistics.getCount());
-
         statistics.setCount(statistics.getCount() + 1);
+
         statisticsRepository.save(statistics);
     }
 
@@ -82,14 +82,11 @@ public class MemberService {
     }
 
     public MemberInfoResponseDto getUserInfo(Long memberId) {
-        Optional<Members> member = memberRepository.findById(memberId);
-        if (member.isEmpty()) {
-            throw new RuntimeException("존재하지 않는 유저입니다.");
-        }
+        Members member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 유저입니다."));
 
-        Members members = memberRepository.findMemberById(memberId);
         MemberInfoResponseDto memberInfoResponseDto = new MemberInfoResponseDto(
-                members.getName(), members.getBirth(), members.getSex(), members.getJob(), members.getUseId()
+                member.getName(), member.getBirth(), member.getSex(), member.getJob(), member.getUseId()
         );
 
         return memberInfoResponseDto;

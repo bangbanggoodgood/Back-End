@@ -15,8 +15,10 @@ public interface StatisticsRepository extends JpaRepository<Statistics, Long> {
     // category와 subCategory를 기준으로 통계를 조회
     List<Statistics> findByCategory(String category);
 
-    // category와 subCategory를 기준으로 하나의 통계를 조회 (update 등에서 사용 가능)
-    Optional<Statistics> findByCategoryAndSubCategory(String category, String subCategory);
+//    // category와 subCategory를 기준으로 하나의 통계를 조회 (update 등에서 사용 가능)
+//    Optional<Statistics> findByCategoryAndSubCategory(String category, String subCategory);
+
+
 }
 
 
