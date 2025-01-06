@@ -1,29 +1,31 @@
 package home.bangbanggoodgood.controller;
 
-import home.bangbanggoodgood.repository.StatisticsRepository;
+import home.bangbanggoodgood.config.JwtTokenProvider;
+import home.bangbanggoodgood.dto.AdminMemberInfoRequestDto;
+import home.bangbanggoodgood.dto.AdminMemberInfoResponseDto;
+import home.bangbanggoodgood.dto.MemberInfoResponseDto;
+import home.bangbanggoodgood.service.MemberService;
 import home.bangbanggoodgood.service.PriceCategoryService;
 import home.bangbanggoodgood.service.StatisticsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 @Controller
-@RequestMapping("/admin/statics")
+@RequestMapping("/admin")
 @RequiredArgsConstructor
-public class StaticsController {
+public class AdminController {
 
     private final StatisticsService statisticsService;
     private final PriceCategoryService priceCategoryService;
+    private final MemberService memberService;
 
-    @GetMapping()
+    @GetMapping("/statics")
     public ResponseEntity<?> getStatics(@RequestParam String kind) {
-        System.out.println("controller 들어와?");
         Map<String, Object> result = null;
         if(kind.equalsIgnoreCase("sex")) {
             result = statisticsService.getCategoryStatistics("sex");
@@ -34,8 +36,20 @@ public class StaticsController {
         } else if(kind.equalsIgnoreCase("infra")) {
 
         }
-
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    @PostMapping("/userList")
+    public ResponseEntity<AdminMemberInfoResponseDto> getMemberInfo(@RequestBody AdminMemberInfoRequestDto requestDto) {
+        AdminMemberInfoResponseDto responseDto = memberService.getUserInfoByUseId(requestDto);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
+
+    @PostMapping("/authority")
+    public ResponseEntity<?> changeAuthority(@RequestBody AdminMemberInfoRequestDto requestDto) {
+        AdminMemberInfoResponseDto responseDto = memberService.changeAuthority(requestDto);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
+
 
 }

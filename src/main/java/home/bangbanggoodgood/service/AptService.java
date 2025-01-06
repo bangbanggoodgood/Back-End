@@ -24,7 +24,7 @@ public class AptService {
     private final InfraRepository infraRepository;  // InfraRepository 추가
     private final HashTagsRepository hashTagsRepository; // HashTagsRepository 추가
 
-    public AptFinalResponseDto show(AptRequestDto dto, Long memberId) {
+    public AptFinalResponseDto show(AptRequestDto dto, Long memberId, String presentPage, String limit) {
         List<String> dongCodes;
         String dongCode;
         int targetMinPrice = 0;
@@ -78,8 +78,16 @@ public class AptService {
             System.out.println("=======================================================================================================");
         }
 
+        // 페이징 처리: 정렬된 리스트에서 원하는 범위만큼 가져오기
+        int presentPageInt = Integer.parseInt(presentPage);  // String -> int로 변환
+        int limitInt = Integer.parseInt(limit);  // String -> int로 변환
+
+        int startIndex = (presentPageInt - 1) * limitInt;
+        int endIndex = Math.min(startIndex + limitInt, result.size());  // 범위가 리스트 크기를 넘지 않도록 처리
+        List<AptResponseDto> pagedResult = result.subList(startIndex, endIndex);
+
         int total = result.size();
-        return new AptFinalResponseDto(total, result);
+        return new AptFinalResponseDto(total, pagedResult);
     }
 
     // 아파트의 가격대 비교

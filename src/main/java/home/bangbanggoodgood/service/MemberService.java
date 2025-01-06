@@ -1,10 +1,13 @@
 package home.bangbanggoodgood.service;
 
+import home.bangbanggoodgood.config.JwtTokenProvider;
+import home.bangbanggoodgood.domain.Authority;
 import home.bangbanggoodgood.domain.Members;
 import home.bangbanggoodgood.domain.Statistics;
 import home.bangbanggoodgood.dto.*;
 import home.bangbanggoodgood.repository.MemberRepository;
 import home.bangbanggoodgood.repository.StatisticsRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -66,6 +69,10 @@ public class MemberService {
                     newStat.setCount(0);
                     return newStat;
                 });
+
+        System.out.println("카테고리 : " + category + ", 서브 카테고리 : " + subCategory);
+        System.out.println("현재 카운트 : " + statistics.getCount());
+
         statistics.setCount(statistics.getCount() + 1);
         statisticsRepository.save(statistics);
     }
@@ -103,6 +110,39 @@ public class MemberService {
         boolean isValidId = isValidId(checkRequestDto.getUseId());
         return new CheckResponseDto(isValidId);
     }
-}
 
+    public AdminMemberInfoResponseDto getUserInfoByUseId(AdminMemberInfoRequestDto requestDto) {
+        Members members = memberRepository.findByUseId(requestDto.getUseId());
+        return new AdminMemberInfoResponseDto(members.getName(), members.getBirth(), members.getSex(), members.getJob(), members.getUseId(), members.getAuthority());
+    }
+
+    public AdminMemberInfoResponseDto changeAuthority(AdminMemberInfoRequestDto requestDto) {
+        // useId로 해당 Member를 조회합니다.
+        Members members = memberRepository.findByUseId(requestDto.getUseId());
+
+        if (members != null) {
+            // 현재 권한을 가져옵니다.
+            Authority auth = members.getAuthority();
+
+            // 권한이 ADMIN이면 USER로 변경
+            if (auth.equals(Authority.ADMIN)) {
+                members.setAuthority(Authority.USER);  // USER로 권한 변경
+            }
+            // 권한이 USER이면 ADMIN으로 변경
+            else if (auth.equals(Authority.USER)) {
+                members.setAuthority(Authority.ADMIN);  // ADMIN으로 권한 변경
+            }
+
+            // 변경된 권한을 DB에 저장합니다.
+            memberRepository.save(members);
+
+            // 변경된 정보를 DTO로 반환
+            return new AdminMemberInfoResponseDto(members.getName(), members.getBirth(), members.getSex(), members.getJob(), members.getUseId(), members.getAuthority());
+        } else {
+            // members가 null인 경우 처리 (예: 해당 userId가 존재하지 않음)
+            throw new EntityNotFoundException("User not found with useId: " + requestDto.getUseId());
+        }
+    }
+
+}
 

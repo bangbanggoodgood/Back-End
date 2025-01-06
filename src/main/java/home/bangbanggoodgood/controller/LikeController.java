@@ -1,5 +1,6 @@
 package home.bangbanggoodgood.controller;
 
+import home.bangbanggoodgood.config.JwtTokenProvider;
 import home.bangbanggoodgood.dto.AptFinalResponseDto;
 import home.bangbanggoodgood.dto.AptResponseDto;
 import home.bangbanggoodgood.dto.LikeRequestDto;
@@ -19,18 +20,25 @@ import java.util.List;
 public class LikeController {
 
     private final LikeService likeService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping
-    public ResponseEntity<LikeResponseDto> postLike(@RequestBody LikeRequestDto requestDto) {
-        LikeResponseDto count = likeService.postLike(requestDto.getMemberId(), requestDto);
+    public ResponseEntity<LikeResponseDto> postLike(@RequestHeader("Authorization") String authorizationHeader,
+                                                    @RequestBody LikeRequestDto requestDto) {
+
+        String token = authorizationHeader.replace("Bearer ", "");
+        Long memberId = jwtTokenProvider.parseMemberId(token);
+        LikeResponseDto count = likeService.postLike(memberId, requestDto);
         return new ResponseEntity<>(count, HttpStatus.OK);
     }
 
-    @GetMapping("/{memberId}")
-    public ResponseEntity<AptFinalResponseDto> getLikes(@RequestParam int presentPage,
-                                                        @RequestParam int limit,
-                                                        @PathVariable Long memberId) {
-        AptFinalResponseDto result = likeService.getLikes(memberId);
+    @GetMapping
+    public ResponseEntity<AptFinalResponseDto> getLikes(@RequestHeader("Authorization") String authorizationHeader,
+                                                        @RequestParam int presentPage,
+                                                        @RequestParam int limit) {
+        String token = authorizationHeader.replace("Bearer ", "");
+        Long memberId = jwtTokenProvider.parseMemberId(token);
+        AptFinalResponseDto result = likeService.getLikes(memberId, presentPage, limit);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

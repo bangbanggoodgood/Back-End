@@ -31,7 +31,7 @@ public class AptController {
 
         // 사용자 아이디 추출
         Long memberId = jwtTokenProvider.parseMemberId(token);
-        AptFinalResponseDto result = aptService.show(requestDto, memberId);
+        AptFinalResponseDto result = aptService.show(requestDto, memberId, presentPage, limit);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
